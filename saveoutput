@@ -1,0 +1,86 @@
+#!/usr/bin/perl -w
+##############################################
+##						  ##
+##      Revised version of autobench	  ##
+## Developed by Raoufehsadat Hashemian 2011 ##
+##          rhashem@ucalgary.ca		  ##
+##						  ##
+##############################################
+
+use strict;
+use Getopt::Long;
+
+#--------------------------------------------------------------------------
+# get_output()
+
+
+sub
+get_output
+{
+    open (IN,$ARGV[1])
+	or 	print "No file to pars: perl\n";
+     my %results;
+       while(<IN>) {
+	if (/^Total: .*replies (\d+)/) {
+	    $results{replies}=$1;
+	}
+	if (/^Connection rate: (\d+\.\d)/) {
+	    $results{conn_rate}=$1;
+	}
+	if (/^Request rate: (\d+\.\d)/) {
+	    $results{req_rate}=$1;
+	}
+	if (/^Reply rate .*min (\d+\.\d) avg (\d+\.\d) max (\d+\.\d) stddev (\d+\.\d)/) {
+	    $results{rep_rate_min} = $1;
+	    $results{rep_rate_avg} = $2;
+	    $results{rep_rate_max} = $3;
+	    $results{rep_rate_stdv} = $4;
+	}
+	if (/^Reply time .* response (\d+\.\d+)/) {
+	    $results{rep_time} = $1;
+	}
+       if (/^Connection time .* connect (\d+\.\d+)/) {
+	    $results{con_time} = $1;
+	}
+
+	if (/^Net I\/O: (\d+\.\d)/) {
+	    $results{net_io} = $1;
+	}
+	if (/^Errors: total (\d+)/) {
+	    $results{errors} = $1;
+	}
+    }
+    close (IN);
+    if ($results{replies} == 0) {
+	$results{percent_errors} = 101;
+    }
+    else {
+	$results{percent_errors} = ( 100 * $results{errors} / $results{replies} );
+    }
+    return \%results;
+}
+
+#--------------------------------------------------------------------------
+# Main
+
+# Declarations
+my  (%res_host1);
+my $sep = ",";
+my $nl = "\n";
+# Get configuration from config file
+  %res_host1 = %{get_output()};
+     # Filename supplied with --file option, try to open it for writing.
+    open(OUT, ">>$ARGV[0]") or die "Cannot open $ARGV[0] for writing\n";
+    # Merge and Display Results
+    print OUT $nl.$ARGV[1].$sep.
+	  $res_host1{req_rate}.$sep.
+	  $res_host1{conn_rate}.$sep.
+	  $res_host1{rep_rate_min}.$sep.
+	  $res_host1{rep_rate_avg}.$sep.
+	  $res_host1{rep_rate_max}.$sep.
+	  $res_host1{rep_rate_stdv}.$sep.
+         $res_host1{rep_time}.$sep.
+	  $res_host1{con_time}.$sep.
+	  $res_host1{net_io}.$sep.
+          $res_host1{percent_errors};
+close (OUT);
