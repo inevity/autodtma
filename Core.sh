@@ -10,7 +10,7 @@
 ### The purpose of this script is to run a set of tests (an experiment) to measure the performance of a  ###
 ### multi-core Web server.												###
 ### The performance testing process includes:									###
-###	1) Serring up the experiment confuration parameters							###
+###	1) Setting up the experiment confuration parameters							###
 ###	2) Opening rates file 											###
 ###	3) For all the request rate values in the rates file:							###
 ###		-- Run Web server											###
