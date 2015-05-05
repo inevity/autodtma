@@ -20,11 +20,11 @@ IFS=$OLDIFS
 for (( c=1; c<=$NumberofNICs; c++ ))
 	do
 
-	cat /proc/interrupts | grep ${array[$c]}-TxRx | awk '{print ""$1""}'  > /home/rhashem/int.txt
+	cat /proc/interrupts | grep ${array[$c]}-TxRx | awk '{print ""$1""}'  > /root/int.txt
 	##### Getting Interrupt Queue List #####
 	# Store file name
 	FILE=""
-	FILE="/home/rhashem/int.txt"
+	FILE="/root/int.txt"
 
 	if [ ! -f $FILE ]; then
   		echo "$FILE : does not exists"

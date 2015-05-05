@@ -43,11 +43,11 @@
 ###Local client ID###
 Local="5"
 ### Your user name in all clients and server must be the same###
-username="rhashem"
+username="root"
 ### Number of NIC cards ###
-NICnum=2
+NICnum=1
 ### NIC cards name ###
-NICnames=",eth0,eth1"
+NICnames=",eth2"
 
 ######### IIIIIIIIIIIIIIIIIII ############
 
@@ -83,7 +83,7 @@ FILE=""
 # Else read it from standard input device
 if [ "$clientfile" == "" ]; then
    FILE="/dev/stdin"
-   echo "You should Enter the name of rates file as the second argument"
+   echo "You should Enter correct file name as the  argument"
 else
    FILE="$clientfile"
    # make sure file exist and readable
@@ -130,6 +130,7 @@ if [ $Sessionbased -eq 1 ]; then
 else
 	lightynum=$TotalCores
 fi
+#lightynum=web server process num
 
 
 cp $ratefile ./rates.txt 
@@ -138,7 +139,7 @@ cp $ratefile ./ProfilerRates.txt
 #####################################################
 ##### Running experiment parameter setup script #####
 #####################################################
- 
+# for server settings 
 ./Setting.sh $corefile $TotalCores $ActiveCoreLocation $serverip $lightynum $Sessionbased $affinity $NICnum $NICnames
 exit 1
 

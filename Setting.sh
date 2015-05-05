@@ -45,11 +45,10 @@ NICnames=$9
 #############################################################
 ### Disabling all the cores (except core 0) on the server ###
 #############################################################
-for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+for i in 1 2 3 4 5 6 7 8 9 10 11
 do
 S="echo 0 >/sys/devices/system/cpu/cpu$i/online"
-  ssh -t rhashem@$serverip << EOF
-  sudo -i 
+  ssh -t root@$serverip << EOF
   $S
   sleep 0.5
   exit
@@ -94,9 +93,8 @@ exec 0<"$FILE"
 while read -r core
 do
 echo Enableing Core Number $core ...
-ssh  -t rhashem@$serverip  <<EOF
+ssh  -t root@$serverip  <<EOF
 sleep 0.5
-sudo -i
 echo 1 >/sys/devices/system/cpu/cpu$core/online
 sleep 0.5
 exit
@@ -113,14 +111,10 @@ IFS=$BAKIFS
 
 ###### Number of RSS Queue is now equal to the number of Lighttpd Processes #####
 
-ssh -t -t rhashem@$serverip  <<EOF
-sudo -i
+ssh -t -t root@$serverip  <<EOF
 rmmod igb
 sleep 1
 modprobe igb RSS=$corenum,$corenum
-sleep 1
-cp ~/WebserverSetting/fastcgi$lightynum.conf /etc/lighttpd/doc/config/conf.d/fastcgi.conf
-cp ~/lightysettings/lighttpd$lightynum.conf /etc/lighttpd/doc/config/lighttpd.conf
 sleep 1
 /etc/init.d/networking restart
 sleep 10
@@ -131,16 +125,15 @@ EOF
 
 ###### Just for IPCM Profiler ######
 
-ssh -t -t rhashem@$serverip  <<EOF
-sudo modprobe msr
+ssh -t -t root@$serverip  <<EOF
+modprobe msr
 exit
 EOF
 
 
 
-ssh -t rhashem@$serverip << EOF
-sudo -i 
-/home/rhashem/SetInterruptsAffinity.sh $NICnum $NICnames $ActiveCoreLocation
+ssh -t root@$serverip << EOF
+/root/SetInterruptsAffinity.sh $NICnum $NICnames $ActiveCoreLocation
 sleep 2
 exit
 exit
@@ -149,16 +142,16 @@ EOF
 
 
 ################Lighttpd Moduls (PHP) Setting ########################
-
-if [ $sess -eq 1 ]; then
-ssh -t -t rhashem@$serverip <<EOF
-sudo cp /home/rhashem/Desktop/lightysettings/modules.conf /etc/lighttpd/doc/config/modules.conf
-exit
-EOF
-else
-ssh -t -t rhashem@$serverip <<EOF
-sudo cp /home/rhashem/Desktop/lightysettings/modules_Nocgi.conf /etc/lighttpd/doc/config/modules.conf
-exit
-EOF
-fi
+#
+#if [ $sess -eq 1 ]; then
+#ssh -t -t rhashem@$serverip <<EOF
+#sudo cp /home/rhashem/Desktop/lightysettings/modules.conf /etc/lighttpd/doc/config/modules.conf
+#exit
+#EOF
+#else
+#ssh -t -t rhashem@$serverip <<EOF
+#sudo cp /home/rhashem/Desktop/lightysettings/modules_Nocgi.conf /etc/lighttpd/doc/config/modules.conf
+#exit
+#EOF
+#fi
 
