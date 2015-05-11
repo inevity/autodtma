@@ -24,7 +24,7 @@ INSTALL_DATA = ${INSTALL} -m 644
 INCLUDES = -I$(top_builddir) -I$(top_srcdir) -I$(top_srcdir)/lib
 DEFS = -DHAVE_CONFIG_H
 CPPFLAGS =  -DNDEBUG -D_GNU_SOURCE -D_XOPEN_SOURCE
-CFLAGS = -g -O2 -Wall
+CFLAGS = -g -O2 -Wall  -D_FORTIFY_SOURCE=0
 LDFLAGS = 
 LIBS = -lm 
 

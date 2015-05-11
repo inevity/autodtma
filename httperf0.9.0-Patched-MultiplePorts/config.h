@@ -10,8 +10,7 @@
 /* Define to one of _getb67, GETB67, getb67 for Cray-2 and Cray-YMP systems.
    This function is required for alloca.c support on those systems.  */
 /* #undef CRAY_STACKSEG_END */
-/*#undef __FD_SETSIZE
-#define __FD_SETSIZE 60000 */
+
 /* Define if you have alloca, as a function or macro.  */
 #define HAVE_ALLOCA 1
 
