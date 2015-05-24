@@ -1,0 +1,122 @@
+diff --git a/GraphGenerator.sh b/GraphGenerator.sh
+index 4b6a67a..284e54e 100755
+--- a/GraphGenerator.sh
++++ b/GraphGenerator.sh
+@@ -187,10 +187,11 @@ done
+   		rm -f $tmpFile
+   		
+                 echo Generating response time per resq/s graph of type $GraphType
+-                
+                 echo "set terminal "$GraphType > $tmpFile;
+   		u=$(echo "./tmp/meanresponsetimeperrate$testname.svg")
+   		echo set output '"'$u'"' >> $tmpFile;
++                echo 'set multiplot layout 2,2' >> $tmpFile;
++               # echo 'set size 1,1' >> $tmpFile; 
+  		echo 'set title "mean response time per rate"' >> $tmpFile;
+  		echo 'set xlabel "reqs/s"' >> $tmpFile;
+                 echo 'set datafile separator ","' >> $tmpFile;
+@@ -198,31 +199,34 @@ done
+         	echo "set yrange [0.001:6.000]" >> $tmpFile;
+   		echo plot '"'./$testname-5alldata.csv'"' using '2:8' title '"'mean response time'"' with linespoints >> $tmpFile;
+   		#`which gnuplot` ../../responseperrate
+-  		`which gnuplot` $tmpFile
+-                 echo 'done'
++  	#	`which gnuplot` $tmpFile
++         #        echo 'done'
+ 
+ 
+-  		echo Generating IO per resq/s graph of type $GraphType
++  	#	echo Generating IO per resq/s graph of type $GraphType
+ 
+-		tmpFile=$1"gnuplot_input"
+-  		rm -f $tmpFile
++	#	tmpFile=$1"gnuplot_input"
++  	#	rm -f $tmpFile
+                 
+-                echo "set terminal "$GraphType > $tmpFile;
+-  		u=$(echo "./tmp/netioperrate$testname.svg")
+-  		echo set output '"'$u'"' >> $tmpFile;
++              #  echo "set terminal "$GraphType >> $tmpFile;
++  	#	u=$(echo "./tmp/netioperrate$testname.svg")
++  	#	echo set output '"'$u'"' >> $tmpFile;
+  		echo 'set title "net io per rate"' >> $tmpFile;
+  		echo 'set xlabel "reqs/s"' >> $tmpFile;
+                 echo 'set datafile separator ","' >> $tmpFile;
+                 echo 'set ylabel "net io in KB"' >> $tmpFile;
+ #  		echo "set yrange [0.001:6.000]" >> $tmpFile;
++                
++        	echo "unset yrange" >> $tmpFile;
++  	#	echo plot '"'./$testname-5alldata.csv'"' using '2:8' title '"'mean response time'"' with linespoints >> $tmpFile;
+   		echo plot '"'./$testname-5alldata.csv'"' using '2:10' title '"'net io'"' with linespoints >> $tmpFile;
+   		#`which gnuplot` ../../responseperrate
+-  		`which gnuplot` $tmpFile
++  	#	`which gnuplot` $tmpFile
+   #		`which gnuplot` ../../ioperrate
+-                echo 'done'     
++         #       echo 'done'     
+ 
+         
+-  		echo Generating CPU core Utilization per resq/s graph of type $GraphType
++  	#	echo Generating CPU core Utilization per resq/s graph of type $GraphType
+ #                z=0
+ #                declare -i index=0
+ #	    for ((  i = 0 ;  i < TotalCores;  i++  ))
+@@ -249,23 +253,23 @@ done
+ #			let z+=2
+ #		fi
+ #	done
+-             tmpFile=$1"gnuplot_input"
+-             rm -f $tmpFile 
+-             echo "set terminal "$GraphType > $tmpFile;
+-             u=$(echo "./tmp/CoreUtilprate$testname.$GraphType")
+-             echo set output '"'$u'"' >> $tmpFile;
+-            # echo 'set title "'Core Utilization per reqs/s'"' >> $tmpFile;
++         #    tmpFile=$1"gnuplot_input"
++          #   rm -f $tmpFile 
++         #    echo "set terminal "$GraphType >> $tmpFile;
++          #   u=$(echo "./tmp/CoreUtilprate$testname.$GraphType")
++           #  echo set output '"'$u'"' >> $tmpFile;
++             echo 'set title "'Core Utilization per reqs/s'"' >> $tmpFile;
+                echo 'set xlabel "reqs/s"' >> $tmpFile;
+               echo 'set datafile separator ","' >> $tmpFile;
+               echo 'set ylabel "core util in %"' >> $tmpFile;
+              echo "set yrange [0:100]" >> $tmpFile;
+              echo plot '"'./$testname-5alldata.csv'"' using '2:49' title '"'core 5'"' with linespoints  >> $tmpFile;
+ #             echo plot '"'./$testname-5alldata.csv'"' using '2:19' title '"'core 0'"' with linespoints,'""' using '2:25' title '"'core 1'"' with linespoints, '""' using '2:31' title '"'core 2'"' with linespoints,'""' using '2:37' title '"'core 3'"' with linespoints,'""' using '2:43' title '"'core 4'"' with linespoints,'""' using '2:49' title '"'core 5'"' with linespoints,'""' using '2:55' title '"'core 6'"' with linespoints,'""' using '2:61' title  '"'core 7'"' with linespoints,'""' using '2:67' title '"'core 8'"' with linespoints,'""' using '2:73' title '"'core 9'"' with linespoints,'""' using '2:79' title '"'core 10'"' with linespoints,'""' using '2:83' title '"'core 11'"' with linespoints >> $tmpFile;
+-             `which gnuplot` $tmpFile
+-           echo 'done'
++  #           `which gnuplot` $tmpFile
++ #          echo 'done'
+ 
+ 
+-  		echo Generating response time  per core util graph of type $GraphType
++#  		echo Generating response time  per core util graph of type $GraphType
+ 
+ #               z=0
+ #                
+@@ -292,12 +296,12 @@ done
+ #		fi
+ #	done
+           
+-		tmpFile=$1"gnuplot_input"
+-  		rm -f $tmpFile
++#		tmpFile=$1"gnuplot_input"
++ # 		rm -f $tmpFile
+ 
+-  		echo "set terminal "$GraphType > $tmpFile;
+-  		u=$(echo "./tmp/resppcoreutil$testname.$GraphType")
+-  		echo set output '"'$u'"' >> $tmpFile;
++  	#	echo "set terminal "$GraphType >> $tmpFile;
++  	#	u=$(echo "./tmp/resppcoreutil$testname.$GraphType")
++  	#	echo set output '"'$u'"' >> $tmpFile;
+   		echo 'set title "'response time per Core Utilization'"' >> $tmpFile;
+   		echo 'set xlabel "Core  Utilization in %"' >> $tmpFile;
+   		echo 'set ylabel "mean response time in s"' >> $tmpFile;
+@@ -305,6 +309,7 @@ done
+                 echo 'set datafile separator ","' >> $tmpFile;
+                 echo plot '"'./$testname-5alldata.csv'"' using '49:8' title '"'core 5'"' with linespoints  >> $tmpFile;
+ #                echo plot '"'./$testname-5alldata.csv'"' using '19:8' title '"'core 0'"' with linespoints,'""' using '25:8' title '"'core 1'"' with linespoints, '""' using '31:8' title '"'core 2'"' with linespoints,'""' using '37:8' title '"'core 3'"' with linespoints,'""' using '43:8' title '"'core 4'"' with linespoints,'""' using '49:8' title '"'core 5'"' with linespoints,'""' using '55:8' title '"'core 6'"' with linespoints,'""' using '61:8' title  '"'core 7'"' with linespoints,'""' using '67:8' title '"'core 8'"' with linespoints,'""' using '73:8' title '"'core 9'"' with linespoints,'""' using '79:8' title '"'core 10'"' with linespoints,'""' using '83:8' title '"'core 11'"' with linespoints >> $tmpFile;
++                echo  'unset multiplot' >> $tmpFile;
+   		`which gnuplot` $tmpFile
+           echo 'done'
+ 
