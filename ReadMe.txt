@@ -28,3 +28,5 @@ Please remember to change the access level of all scripts to executable
 After following the above steps you can run the Core.sh script to run an experiment.
 
 root$./Core.sh  Testname  ./cores.txt ./rates.txt 2 ./clients.txt 8 2 192.168.0.100 80,80  1K.html 200000  0  1 1 1
+
+./Core.sh testname ./rates.txt www.myweb.com 80 index.html 80000 0 0 0
