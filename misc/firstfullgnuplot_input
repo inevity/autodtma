@@ -1,0 +1,7 @@
+set terminal 0
+set output "./tmp/resppcoreutilfirstfull.0"
+set title "response time per Core Utilization"
+set xlabel "Core  Utilization in %"
+set ylabel "mean response time in s"
+set datafile separator ","
+plot "./firstfull-5alldata.csv" using 19:8 title "core 0" with linespoints,"" using 25:8 title "core 1" with linespoints, "" using 31:8 title "core 2" with linespoints,"" using 37:8 title "core 3" with linespoints,"" using 43:8 title "core 4" with linespoints,"" using 49:8 title "core 5" with linespoints,"" using 55:8 title "core 6" with linespoints,"" using 61:8 title "core 7" with linespoints,"" using 67:8 title "core 8" with linespoints,"" using 73:8 title "core 9" with linespoints,"" using 79:8 title "core 10" with linespoints,"" using 83:8 title "core 11" with linespoints

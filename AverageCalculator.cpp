@@ -2,7 +2,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
-#define cpu_num 8
+#define cpu_num 12
 int main(int argc, char *argv[])
 {
 	int test_duration = 0;
@@ -30,25 +30,27 @@ int main(int argc, char *argv[])
 		printf("AverageCalculator: Not Enough Arguments\nProgram exited without doing anything!");
 		exit(0);
 	}
-	float rate=atof(argv[2]);	// Current request rate 
+//AverageCalculator $datfilename(arg1) $rate 10 $TotalCores $Home$testname/ $Sessionbased $Connections >> UtilSummary$test    name.csv
+	float rate=atof(argv[2]);	// Current request rate,erate or peroid?
 	int spare=atoi(argv[3]);    // Number of Spare samples collected before test
     int cpunum=atoi(argv[4]);
 	int sessbased=atoi(argv[6]); // Is the workload session based
 	int connections=atoi(argv[7]); // Total number of connections in the test (sessions)
 	strcpy(filename,argv[5]);
-	strcat(filename,"tmp/Total_Idle");
+	strcat(filename,"tmp/Total_Idle");//home.testname.tmp.totalidle.utiltestname00015.dat
 	strcat(filename,argv[1]); // Name of output data file
 	strcat(filename,".dat"); 
 	idledat=fopen(filename,"w");
-	strcpy(filename,argv[5]); // Name of output data file
+	strcpy(filename,argv[5]); // Name of output data file,home.testname.tmp.totaluser.utiltestname00015.dat
 	strcat(filename,"tmp/Total_User");
 	strcat(filename,argv[1]); // Data file path
 	strcat(filename,".dat"); 
 	userdat=fopen(filename,"w");
-	strcpy(filename,argv[5]); // Name of output data file
+	strcpy(filename,argv[5]); // Name of output data file,sys.dat
 	strcat(filename,"tmp/Total_Sys");
-	strcat(filename,argv[1]); // Data file path
+	strcat(filename,argv[1]); // Data file path ,utiltestname00015
 	strcat(filename,".dat"); 
+//        printf("dat per cpu filename %s\n",filename);
 	sysdat=fopen(filename,"w");
 	if (!sysdat || !userdat || !idledat){
 		
@@ -57,47 +59,58 @@ int main(int argc, char *argv[])
 
 	}
 	strcpy(filename,argv[5]);
-	strcat(filename,argv[1]);
-	strcat(filename,".csv"); 
+	strcat(filename,argv[1]);//home.testname.utiltestname000015
+	strcat(filename,".csv"); //home.testname.utiltestname.csv,collectl outputfile
 	current=fopen(filename,"r");
 	if (!current){
 		printf("AverageCalculator: Cannot open %s\nProgram exited without doing anything! ",filename);
 		exit(0);
 	}
-	// Discarding the spare samples 
+	// Discarding the spare samples ,fgets but do nothing,the time=req time,only focus req time?
 	for (int j=0;j<spare;j++){
-		fgets(line,1000,current);
+		fgets(line,10000,current);
 	}
 	//Caclulating test duration
 	if (sessbased)
 		test_duration = sessbased;
 	else
-		test_duration = rate* connections +2;
+		test_duration = rate* connections +2;//correct?
 
-	for( int j=0;j<cpu_num;j++){
-		cpus_idle[j]=new float[test_duration];
+	for( int j=0;j<cpu_num;j++){// 8 cores
+		cpus_idle[j]=new float[test_duration];//array object
 		cpus_user[j]=new float[test_duration];
 		cpus_sys[j]= new float[test_duration];
 	}
-	for(int j=0;j<test_duration;j++){
-			fgets(line,1000,current);
+	for(int j=0;j<test_duration;j++){//collect data
+			fgets(line,10000,current);
 			pch = strtok (line,",");
 			pch = strtok (NULL,",");
 			int k=0;
 			int l=0;
 			while (pch != NULL && l!=cpu_num)
 			{
-				//printf ("%s\n",pch);
+	//			printf ("cpu .......%d\n",l);
 			
 				pch = strtok (NULL, ",");
-				cpus_user[l][j] = atoi(pch);
+				cpus_user[l][j] = atoi(pch);//l is cpuindex
 				
+				pch = strtok (NULL, ",");
 				pch = strtok (NULL, ",");
 				cpus_sys[l][j] = atoi(pch);
-		
+             		
+//				printf ("pch should sys per cpu %d  %s\n",l,pch);
 				pch = strtok (NULL, ",");
+				pch = strtok (NULL, ",");
+				pch = strtok (NULL, ",");
+				pch = strtok (NULL, ",");
+				pch = strtok (NULL, ",");
+//				printf ("pch should idle per cpu %d  %s\n",l,pch);
 				cpus_idle[l][j] = atoi(pch);
 				
+				pch = strtok (NULL, ",");
+				pch = strtok (NULL, ",");
+				pch = strtok (NULL, ",");
+				pch = strtok (NULL, ",");
 				l++;
 			}
 		}
@@ -105,7 +118,7 @@ int main(int argc, char *argv[])
 	float totalmin[3]={100*cpunum,0,0};
 	float tmp[3]={0,0,0};
 			int b=0;
-			for(b=0;b<test_duration;b++){
+			for(b=0;b<test_duration;b++){//test_duration !=collectl sample couts.. each second each total.
 				for (int j=0;j<cpu_num;j++){
 					tmp[0]+=cpus_idle[j][b];
 					tmp[1]+=cpus_user[j][b];
@@ -135,7 +148,8 @@ int main(int argc, char *argv[])
 			totalavg[2]/=test_duration;
 			sprintf(temp,"%.8f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,",rate,100*cpunum-totalavg[0],100*cpunum-totalmin[0],totalavg[1],totalmin[1],totalavg[2],totalmin[2]);
 			strcat(out,temp);
-			for (int j=0;j<8;j++){
+//next per cpu statistic
+			for (int j=0;j<cpu_num;j++){
 				idlecpuavg[j]=0;
 				idlecpumin[j]=cpus_idle[j][0];
 				usercpuavg[j]=0;

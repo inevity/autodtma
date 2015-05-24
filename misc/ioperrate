@@ -1,0 +1,7 @@
+set terminal svg
+set output "./tmp/testname-netio-per-rate.svg"
+set title "net io per rate"
+set xlabel "reqs/s"
+set ylabel "net io in KB"
+set datafile separator ','
+plot './testname-5alldata.csv' using 2:10  title "Net io " with linespoints

@@ -1,0 +1,7 @@
+set terminal svg
+set output "./tmp/cpuutil-per-rate.svg"
+set title "cpuutil per rate"
+set xlabel "reqs/s"
+set ylabel "cpuutilin %"
+set datafile separator ','
+plot './testname-5alldata.csv' using 2:19 title "CPU core 0 util  " with linespoints

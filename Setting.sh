@@ -42,13 +42,15 @@ sess=$6
 affinity=$7
 NICnum=$8
 NICnames=$9
+
 #############################################################
-### Disabling all the cores (except core 0) on the server ###
+### Disabling all the cores (except core 0) on the server,disable HT ###
+# 10.10.10.254 is client internal network ip,not wan ip
 #############################################################
 for i in 1 2 3 4 5 6 7 8 9 10 11
 do
 S="echo 0 >/sys/devices/system/cpu/cpu$i/online"
-  ssh -t root@$serverip << EOF
+  ssh -b 10.10.10.254 -t root@$serverip << EOF
   $S
   sleep 0.5
   exit
@@ -93,7 +95,7 @@ exec 0<"$FILE"
 while read -r core
 do
 echo Enableing Core Number $core ...
-ssh  -t root@$serverip  <<EOF
+ssh  -b 10.10.10.254 -t root@$serverip  <<EOF
 sleep 0.5
 echo 1 >/sys/devices/system/cpu/cpu$core/online
 sleep 0.5
@@ -109,18 +111,23 @@ IFS=$BAKIFS
 ### Restarting NIC and applying the settings ###
 ################################################
 
-###### Number of RSS Queue is now equal to the number of Lighttpd Processes #####
+###### Number of RSS Queue is now equal to the number of fc Processes now disable it #####
+#
+#ssh -b 10.10.10.254  -t -t root@$serverip  <<EOF
+#rmmod ixgbe
+#sleep 1
+#modprobe ixgbe RSS=$corenum,$corenum
+#sleep 1
+#/etc/init.d/networking restart
+#sleep 10
+#exit
+#exit
+#EOF
+#
 
-ssh -t -t root@$serverip  <<EOF
-rmmod igb
-sleep 1
-modprobe igb RSS=$corenum,$corenum
-sleep 1
-/etc/init.d/networking restart
-sleep 10
-exit
-exit
-EOF
+
+# jumber frame 9000 have been in the etcinterface..
+
 
 
 ###### Just for IPCM Profiler ######
@@ -131,14 +138,15 @@ exit
 EOF
 
 
-
-ssh -t root@$serverip << EOF
-/root/SetInterruptsAffinity.sh $NICnum $NICnames $ActiveCoreLocation
-sleep 2
-exit
-exit
-EOF
-
+# SetInterruptsAffinity
+#
+#ssh -t root@$serverip << EOF
+#/root/SetInterruptsAffinity.sh $NICnum $NICnames $ActiveCoreLocation
+#sleep 2
+#exit
+#exit
+#EOF
+#
 
 
 ################Lighttpd Moduls (PHP) Setting ########################
@@ -155,3 +163,4 @@ EOF
 #EOF
 #fi
 
+################Other Server  Setting ########################
