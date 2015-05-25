@@ -267,8 +267,9 @@ done
 #
 ./FileCollector.sh $testname $serverip
 
-if [ $Sessionbased -eq 1 ]; then
-./GraphGenerator.sh $testname $TotalCores $ActiveCoreLocation jpeg 200 $connections ./RUNs/
+if [ $Sessionbased -ge 1 ]; then
+#./GraphGenerator.sh $testname $TotalCores $ActiveCoreLocation svg 200 $connections ./RUNs/
+./GraphGenerator.sh $testname $TotalCores 2 svg $Sessionbased $connections ./RUNs/
 else
 ./GraphGenerator.sh $testname $TotalCores 2 svg $Sessionbased $connections ./RUNs/
 fi
