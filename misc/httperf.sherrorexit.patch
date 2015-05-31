@@ -1,0 +1,87 @@
+diff --git a/httperf.sh b/httperf.sh
+index 346e297..db951a3 100755
+--- a/httperf.sh
++++ b/httperf.sh
+@@ -1,5 +1,5 @@
+ #!/bin/sh
+-#set -x
++set -x
+ ulimit -n 102400
+ H='~/RUNs/'
+ rate=$1
+@@ -19,8 +19,14 @@ else
+ #taskset 0x00000002 httperf --server=$serverip   --client=$clientid/8 --des-ports=$port  --period=e$rate --uri=/$url --hog --num-calls=3 --num-conns=$connections --rfile-name=$H$rate-$testnamecsv > $H$rate-$testnametxt
+ #taskset 0x00000002 httperf --debug 1 --server=$serverip   --client=$clientid/8 --des-ports=$port  --period=e$rate --uri=/$url --hog --num-calls=3 --num-conns=$connections --rfile-name=$rate-$testnamecsv > $rate-$testnametxt
+ taskset 0x00000002 httperf --server=$serverip   --client=$clientid/8 --des-ports=$port  --period=e$rate --uri=/$url --hog --num-calls=3 --num-conns=$connections --rfile-name=$rate-$testnamecsv > $rate-$testnametxt
++out=$?
++if [ $out -eq 1 ] ; then
++rm -rf $rate-$testnametxt
++else 
++echo "normal httperf test"
++fi
+ fi
+ ##################################################
+ ##### Saving the Summary on the Summary file #####
+ ##################################################
+-./saveoutput $testnamecsv $rate-$testnametxt
++([ -f $rate-$testnametxt ] && ./saveoutput $testnamecsv $rate-$testnametxt) || exit 1
+diff --git a/Core.sh b/Core.sh
+index 052db1b..c7a7244 100755
+--- a/Core.sh
++++ b/Core.sh
+@@ -34,7 +34,7 @@ do
+      (( c++ ))
+ 
+ #for filesize in 612 1024 524288 1048576 10485760 104857600
+-for filesize in 612 1024
++for filesize in 1048576 524288 1024
+ do
+     #bitnum=$(`echo $filesize |wc -c`)
+     bitnum=`echo $filesize |wc -c`
+@@ -261,6 +261,7 @@ EOF
+ ####### Waiting till the test is finished #########
+         sleep $testtime
+         sleep 30
++#how can wei get the backgroud process exit since error ,so can reduce sleep time
+ 
+ 
+         #####################################
+diff --git a/httperf0.9.0-Patched-MultiplePorts/stat/basic.c b/httperf0.9.0-Patched-MultiplePorts/stat/basic.c
+index e25063b..65dcf21 100644
+--- a/httperf0.9.0-Patched-MultiplePorts/stat/basic.c
++++ b/httperf0.9.0-Patched-MultiplePorts/stat/basic.c
+@@ -159,7 +159,6 @@ conn_fail (Event_Type et, Object *obj, Any_Type reg_arg, Any_Type call_arg)
+ {
+   static int first_time = 1;
+   int err = call_arg.i;
+-
+   assert (et == EV_CONN_FAILED);
+ 
+   switch (err)
+@@ -169,13 +168,14 @@ conn_fail (Event_Type et, Object *obj, Any_Type reg_arg, Any_Type call_arg)
+ #endif
+     case EMFILE:	++basic.num_sock_fdunavail; break;
+     case ENFILE:	++basic.num_sock_ftabfull; break;
+-    case ECONNREFUSED:	++basic.num_sock_refused; break;
++    case ECONNREFUSED:	exit(1);++basic.num_sock_refused; break;
+     case ETIMEDOUT:
+ 		printf("\n-------------------------------------------------");
+ 		++basic.num_sock_timeouts; break;
+     case EPIPE:
+     case ECONNRESET:	
+ 		printf("\n************************************************");
++                exit(1);
+       ++basic.num_sock_reset;
+       break;
+ 
+@@ -185,8 +185,10 @@ conn_fail (Event_Type et, Object *obj, Any_Type reg_arg, Any_Type call_arg)
+ 	  first_time = 0;
+ 	  fprintf (stderr, "%s: connection failed with unexpected error %d\n",
+ 		   prog_name, err);
++         exit(1);
+ 	}
+       ++basic.num_other_errors;
++      exit(1);
+       break;
+     }
+ }
