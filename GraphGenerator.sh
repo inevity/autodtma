@@ -99,7 +99,7 @@ do
 	ls -lah ./
 	echo "***"
 	echo Now calculating the average using the following parameters
-	echo $datfilename $rate 10 $TotalCores $Home$testname/ $Sessionbased $Connections
+	echo $datfilename $rate 36 $TotalCores $Home$testname/ $Sessionbased $Connections
 	echo "*** 36lines got ignod"
 	#../../AverageCalculator $datfilename $rate 36 $TotalCores $Home$testname/ $Sessionbased $Connections >> UtilSummary$testname.csv
 	../../average $datfilename $rate 36 $TotalCores ./ $Sessionbased $Connections >> UtilSummary$testname.csv

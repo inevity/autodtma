@@ -1,0 +1,11 @@
+---
+- hosts: 10.10.10.254
+  remote_user: root
+  vars:
+       outfile: '{{outfile}}'
+  tasks:
+  - name: run collect
+    shell: dummy=$(collectl -sCDmNZ -c 300  -F1 -i1:5 --sep , -oz --procfilt csquid -P -f '{{outfile}}')
+    async: 300
+    poll: 0
+

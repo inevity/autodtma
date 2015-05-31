@@ -4,7 +4,7 @@
 ulimit -n 102400
 ###Local client ID###
 Local="5"
-testname=$1
+testname1=$1
 #corefile=$2
 ratefile=$2
 #NumberofClients=$4
@@ -27,10 +27,57 @@ username="root"
 ############################################
 ##### Setting up experiment parameters #####
 ############################################
+for filesize in 612 1024 524288 1048576 10485760 104857600
+do
+    #bitnum=$(`echo $filesize |wc -c`)
+    bitnum=`echo $filesize |wc -c`
+    case "$bitnum" in
+          4)
+           cp /usr/share/nginx/html/612B /usr/share/nginx/html/index.html
+          ;;
+          5)
+           cp /usr/share/nginx/html/1KB /usr/share/nginx/html/index.html
+          ;;
+          7)
+           cp /usr/share/nginx/html/512KB /usr/share/nginx/html/index.html
+          ;;
+          8)
+           cp /usr/share/nginx/html/1MB /usr/share/nginx/html/index.html
+          ;;
+          9)
+           cp /usr/share/nginx/html/10MB /usr/share/nginx/html/index.html
+          ;;
+          10)
+           cp /usr/share/nginx/html/100MB /usr/share/nginx/html/index.html
+          ;;
+          *)
+           echo "not needed file size "
+          ;;
+    esac
 
+#    cp /usr/share/nginx/index/$filesize /usr/share/nginx/index/index.html
+    ansible -u root 10.10.10.254 -m shell -a "/usr/local/squid/bin/refresh_cli -f http://www.myweb.com/index.html"
+    #realfsize=$(`wget http://www.myweb.com/index.html --spider --server-response -O - 2>&1 | sed -ne '/Content-Length/{s/.*: //;p}'`)
+    realfsize=`wget http://www.myweb.com/index.html --spider --server-response -O - 2>&1 | sed -ne '/Content-Length/{s/.*: //;p}'`
+    #if [ $realfsize eq $filesize ]
+    if [ $realfsize == $filesize ]
+    then
+       wget http://www.myweb.com/index.html
 echo "fc Will be running in totalcores-2  instances,(in fact 6 instances) ,exclude core 0 and one nginx(lscs) cores"
-echo "***"
-
+echo "using filesize $filesize,and replicate three times"
+      m=$(echo "$testname1-$filesize")
+      # filesize not filezize why need put in the while loop
+      
+      echo "begining test filesize $m"
+      echo "***"
+c=0
+#while [ $c -lt 4 ] must have space blank!
+while [ $c -lt 3 ]
+do
+     (( c++ ))
+     # m=$(echo "$testname1-$filesize")
+      #echo "$m"
+     testname=$(echo "$m-$c")
 #if [ $Sessionbased -eq 1 ]; then
 #        if [ $ActiveCoreLocation -eq 2 ]; then
 #                sqlcore=$((TotalCores - 1))
@@ -76,7 +123,7 @@ BAKIFS=$IFS
 IFS=$(echo -en "\n")
 exec 3<&0
 exec 0<"$FILE"
-echo Rate file is Now open
+echo "Rate file is Now open,using filesize $filesize,the $c run" 
 sleep 1
 
 
@@ -114,7 +161,7 @@ EOF
 ssh -T $username@$serverip <<EOF
 echo "Restarting Web Servers ..."
 service fc start
-sh ./taskset.sh
+sh ~/RUNs/misc/taskset.sh
 sleep 1
 exit
 EOF
@@ -149,12 +196,20 @@ EOF
         #####################################
 #collectl -sCDNm -c 3650 --rawtoo -P -f ./output backgroug process exit,why?
 ### CPU utilization Monitor ###
+#collectl -sCDNm -c 300 --rawtoo  --sep , -F2 -oz -P -f ~/UtilLog/util-$testname-$rate
+#collectl -sCDMNZ -c 300 -F1  -i1:5 --procfilt csquid -oTm
+#collectl -sCDMNZ -c 300 --rawtoo  --sep , -F1 -oTmz -P -f ~/UtilLog/util-$testname-$rate  -i1:5 --procfilt csquid -oTm
 
-ssh -T $username@$serverip <<EOF
-collectl -sCDNm -c 300 --rawtoo  --sep , -F2 -oz -P -f ~/UtilLog/util-$testname-$rate
-sleep 1
-exit
-EOF
+
+
+#
+#ssh -T $username@$serverip <<EOF
+#collectl -sCDmNZ -c 300  -F1 -i1:5 --sep , -oz --procfilt csquid -P -f ~/UtilLog/util-$testname-$rate 
+#sleep 1
+#exit
+#EOF
+#
+ansible-playbook play.yml --verbose --extra-vars "outfile=/root/UtilLog/util-$testname-$rate"
 
 ### Hardware Monitor ###
 
@@ -248,9 +303,14 @@ fi
 
 
 done
+# for rates
+
+
+
 
 #############################
-##### End of tests loop #####
+##### End of tests loop of a filesize  #####
+
 #############################
 
 
@@ -301,5 +361,78 @@ fi
 exec 0<&3
 IFS=$BAKIFS
 
-echo "*******************************End Of the Test $testname*******************************************"
 
+
+
+
+
+
+
+done 
+# for replication
+
+else
+       echo "wrong real file size $realfsize ,need size $filesize"
+#       exit
+       continue
+     fi
+
+done
+#for all filesize
+
+
+
+##############################
+###### End of tests loop #####
+##############################
+#
+#
+#########################################################
+###### Data collection and result management taskes #####
+#########################################################
+#
+##pass=","
+##for (( c=1; c<=$NumberofClients; c++ ))
+##        do
+##        pass="$pass${Clientsip[c]},"
+##        done
+##
+##
+#./FileCollector.sh $testname $serverip
+#
+#if [ $Sessionbased -ge 1 ]; then
+##./GraphGenerator.sh $testname $TotalCores $ActiveCoreLocation svg 200 $connections ./RUNs/
+#./GraphGenerator.sh $testname $TotalCores 2 svg $Sessionbased $connections ./RUNs/
+#else
+#./GraphGenerator.sh $testname $TotalCores 2 svg $Sessionbased $connections ./RUNs/
+#fi
+#
+##if [ $HWmonitor -eq 1 ]; then
+##
+##case "$Profiler" in
+##0)
+##./OprofileOutputParser  $testname
+##1)
+##echo "copying Perf Rates file"
+##cp ./PerfRates.txt ./RUNs/$testname/PerfRates.txt
+##echo "copying Perf Events file"
+##cp ./perfevent.txt ./RUNs/$testname/perfevent.txt
+##cd  RUNs/$testname
+##./PerfOutputParser  $testname
+##;;
+##2)
+##./IPCMOutputParser  $testname
+##;;
+##*)
+##echo "Iligal Profiler Code"
+##;;
+##esac
+##
+##fi
+#
+#
+#exec 0<&3
+#IFS=$BAKIFS
+#
+echo "*******************************End Of the Test $testname1*******************************************"
+#
