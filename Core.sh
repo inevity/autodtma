@@ -27,7 +27,14 @@ username="root"
 ############################################
 ##### Setting up experiment parameters #####
 ############################################
-for filesize in 612 1024 524288 1048576 10485760 104857600
+c=0
+#while [ $c -lt 4 ] must have space blank!
+while [ $c -lt 3 ]
+do
+     (( c++ ))
+
+#for filesize in 612 1024 524288 1048576 10485760 104857600
+for filesize in 612 1024
 do
     #bitnum=$(`echo $filesize |wc -c`)
     bitnum=`echo $filesize |wc -c`
@@ -70,11 +77,6 @@ echo "using filesize $filesize,and replicate three times"
       
       echo "begining test filesize $m"
       echo "***"
-c=0
-#while [ $c -lt 4 ] must have space blank!
-while [ $c -lt 3 ]
-do
-     (( c++ ))
      # m=$(echo "$testname1-$filesize")
       #echo "$m"
      testname=$(echo "$m-$c")
@@ -303,7 +305,7 @@ fi
 
 
 done
-# for rates
+# for rates for a filesize 
 
 
 
@@ -368,10 +370,8 @@ IFS=$BAKIFS
 
 
 
-done 
-# for replication
 
-else
+     else
        echo "wrong real file size $realfsize ,need size $filesize"
 #       exit
        continue
@@ -381,6 +381,8 @@ done
 #for all filesize
 
 
+done 
+# for replication
 
 ##############################
 ###### End of tests loop #####

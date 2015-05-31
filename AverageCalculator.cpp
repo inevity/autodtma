@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
 	else
 		test_duration = rate* connections +2;//correct?
 
-	for( int j=0;j<cpu_num;j++){// 8 cores
+	for( int j=0;j<cpu_num;j++){// 12 cores
 		cpus_idle[j]=new float[test_duration];//array object
 		cpus_user[j]=new float[test_duration];
 		cpus_sys[j]= new float[test_duration];

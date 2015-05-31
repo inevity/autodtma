@@ -32,7 +32,7 @@ Home=$7
 ### Home folder
 
 cd $Home$testname
-ls
+#ls
 tempfile="./tmp/temp.txt"
 [ -d Plots ] && rm -rf Plots
 [ -d tmp ] && rm -rf tmp
@@ -51,7 +51,7 @@ FILE=""
 # Else read it from standard input device
 if [ "$tempfile" == "" ]; then
    FILE="/dev/stdin"
-   echo "You should Enter the name of rates file as the second argument"
+   echo "You should Enter the name of cpu utilization file"
 else
    FILE="$tempfile"
    # make sure file exist and readable
@@ -79,7 +79,9 @@ while read -r utilfilename
 do
 
 	datfilename=$(echo "$utilfilename" | cut -d. --fields=1,2)
-	rate=$(echo "$utilfilename" | cut -d- --fields=3)
+#	rate=$(echo "$utilfilename" | cut -d- --fields=3)
+	rate=$(echo "$utilfilename" | cut -d- --fields=5)
+#filename change util-all36all-1024-1-0.00020-ubuntu-20150531.cpu.
 #	rate=$(echo "0.$rate")
 
 	echo "***"
