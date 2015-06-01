@@ -98,13 +98,14 @@ do
 	#########################################################################
 	##### Running the C++ program to calculate the averages utilization #####
 	#########################################################################
-	ls -lah ./
+	#ls -lah ./
 	echo "***"
 	echo Now calculating the average using the following parameters
 	echo $datfilename $rate 36 $TotalCores $Home$testname/ $Sessionbased $Connections
 	echo "*** 36lines got ignod"
 	#../../AverageCalculator $datfilename $rate 36 $TotalCores $Home$testname/ $Sessionbased $Connections >> UtilSummary$testname.csv
-	../../average $datfilename $rate 36 $TotalCores ./ $Sessionbased $Connections >> UtilSummary$testname.csv
+	#../../average $datfilename $rate 36 $TotalCores ./ $Sessionbased $Connections >> UtilSummary$testname.csv
+	../../average1 $datfilename $rate 38 $TotalCores ./ $Sessionbased $Connections >> UtilSummary$testname.csv
 
 	########################################
 	##### Generating Utilization Plots #####
@@ -183,7 +184,11 @@ done
                 all=$(echo "./$testname-5alldata.csv")
  
 		sed '1d' ./$testname-5.csv > $testname-5d1.csv
-                paste -d"," ./$testname-5d1.csv ./UtilSummary$testname.csv > $testname-5alldata.csv
+                decare -i errnum=0
+                errnum=$(cat $testname-5d1.csv |awk -F , '{ if ($11 != 0) { print $11} }'|wc -l)  
+                awk 'NR > '''$errnum'''' ./UtilSummary$testname.csv > ./UtilSummary$testname-d.csv
+                awk 'NR > '''$errnum'''' ./$testname-5d1.csv > $testname-5d1d.csv
+                paste -d"," ./$testname-5d1d.csv ./UtilSummary$testname-d.csv > $testname-5alldata.csv
  
 		tmpFile=$1"gnuplot_input"
   		rm -f $tmpFile

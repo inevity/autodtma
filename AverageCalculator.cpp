@@ -74,7 +74,8 @@ int main(int argc, char *argv[])
 	if (sessbased)
 		test_duration = sessbased;
 	else
-		test_duration = rate* connections +2;//correct?
+		//test_duration = rate* connections +2;//correct?
+		test_duration = rate* connections -3;//correct?
 
 	for( int j=0;j<cpu_num;j++){// 12 cores
 		cpus_idle[j]=new float[test_duration];//array object
