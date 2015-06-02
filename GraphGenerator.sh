@@ -180,16 +180,17 @@ do
 
 done
 
-#from client review
+#from client review for this filesize 
                 all=$(echo "./$testname-5alldata.csv")
  
 		sed '1d' ./$testname-5.csv > $testname-5d1.csv
-                decare -i errnum=0
-                errnum=$(cat $testname-5d1.csv |awk -F , '{ if ($11 != 0) { print $11} }'|wc -l)  
+              declare -i errnum=0
+#                errnum=$(cat $testname-5d1.csv |awk -F , '{ if ($11 != 0) { print $11} }'|wc -l) normal rate,continue   
+                errnum=$(cat $testname-5d1.csv |awk -F , '{ if ($11 != 0) { print NR} }'|sort -nr|head -1) 
                 awk 'NR > '''$errnum'''' ./UtilSummary$testname.csv > ./UtilSummary$testname-d.csv
                 awk 'NR > '''$errnum'''' ./$testname-5d1.csv > $testname-5d1d.csv
                 paste -d"," ./$testname-5d1d.csv ./UtilSummary$testname-d.csv > $testname-5alldata.csv
- 
+#  test abnormal 
 		tmpFile=$1"gnuplot_input"
   		rm -f $tmpFile
   		
