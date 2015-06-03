@@ -30,3 +30,6 @@ After following the above steps you can run the Core.sh script to run an experim
 root$./Core.sh  Testname  ./cores.txt ./rates.txt 2 ./clients.txt 8 2 192.168.0.100 80,80  1K.html 200000  0  1 1 1
 
 ./Core.sh testname ./rates.txt www.myweb.com 80 index.html 80000 0 0 0
+./Core.sh 1Kto1MB ./misc/rates.txt1KB-1MB www.myweb.com 80 index.html 40000 0 0 0
+single client
+change filesize from Core sh ,repleate three,initial release.
