@@ -205,6 +205,8 @@ EOF
 #        fi
 
 
+
+
         #####################################
         ##### Starting Monitoring tools #####
         #####################################
@@ -223,7 +225,18 @@ EOF
 #exit
 #EOF
 #
-ansible-playbook play.yml --verbose --extra-vars "outfile=/root/UtilLog/util-$testname-$rate"
+ansible-playbook play.yml --verbose --extra-vars "outfile=/root/UtilLog/util-$testname-$rate ctime=$testtime"
+
+
+
+#start test
+        sleep 20
+        echo "Running Local Client"
+
+        ./httperf.sh $rate $testname-$Local.csv $testname-$Local.txt $Local $uri $connections $Sessionbased $serverports $serverip&
+
+
+
 
 ### Hardware Monitor ###
 
@@ -244,12 +257,16 @@ exit
 EOF
                 ;;
                 1)
-Perfevents=$(cat ./events.txt)
-ssh -T $username@$serverip <<EOF
-perf record -a -g -p squidpid -o $testname-$rate.perf
-exit
-EOF
-                ;;
+#Perfevents=$(cat ./events.txt)
+#ssh -T $username@$serverip <<EOF
+#perf record -a -g -p squidpid -o $testname-$rate.perf&
+#exit
+#EOF
+#pids=`sshpass -p 'sophnep!@#' ps -ef |grep fc-cache |grep squid |awk '{print $2'}|tr '\n' ','`
+#pids=`ps -ef |grep fc-cache |grep squid |awk '{print $2'}|tr '\n' ','`
+#ansible-playbook prof.yml --verbose --extra-vars "pids=$pids outfile=/root/util$testname-$rate ctime=$testtime"
+ansible-playbook flamecreate.yml -v --verbose --extra-vars "outfile=/root/Prof/perf$testname-$rate" 
+               ;;
                 2)
 ssh -T $username@$serverip <<EOF
  ~/IntelPCM/pcm.x 1 -nc -ns -nsys -csv > pcm.csv &
@@ -262,58 +279,55 @@ EOF
                 esac
 
         fi
-
-
-
-        sleep 20
-        echo "Running Local Client"
-
-        ./httperf.sh $rate $testname-$Local.csv $testname-$Local.txt $Local $uri $connections $Sessionbased $serverports $serverip&
-
-####### Waiting till the test is finished #########
+####### Waiting till the monitor and test is finished #########
         sleep $testtime
         sleep 30
 
 
         #####################################
-        ##### Stopping Monitoring tools #####
-        #####################################
+#        ##### Stopping Monitoring tools ,for now we use time in perf ,no need kill perf  #####
+#        #####################################
+#
+#if [ $HWmonitor -eq 1 ]; then
+#
+#case "$Profiler" in
+#                0)
+#ssh -T $username@$serverip <<EOF
+#opcontrol --stop
+#opreport --merge=cpu,lib --session-dir=~/OpLog/op-$testname-$rate | grep -E 'lighttpd|no-vmlinux' >> ~/ProfileLog/profiler-$testname-$rate.csv
+#sleep 3
+#exit
+#EOF
+#                ;;
+#                1)
+#                echo "Perf data collection ends"
+#ssh -T $username@$serverip <<EOF
+#killall perf
+#perf report -n -g -i /root/$testname-$rate.perf >$testname-$rate.report
+#sleep 1
+#exit
+#EOF
+#                ;;
+#                2)
+#ssh -T $username@$serverip <<EOF
+#killall pcm.x
+#cp ~/out.csv ~/ProfileLog/profiler-$testname-$rate.csv
+#exit
+#EOF
+#                ;;
+#                *)
+#                echo "Iligal Profiler Code"
+#                ;;
+#                esac
+#
+#
+#
+#fi
+#
 
-if [ $HWmonitor -eq 1 ]; then
 
-case "$Profiler" in
-                0)
-ssh -T $username@$serverip <<EOF
-opcontrol --stop
-opreport --merge=cpu,lib --session-dir=~/OpLog/op-$testname-$rate | grep -E 'lighttpd|no-vmlinux' >> ~/ProfileLog/profiler-$testname-$rate.csv
-sleep 3
-exit
-EOF
-                ;;
-                1)
-                echo "Perf data collection ends"
-ssh -T $username@$serverip <<EOF
-killall perf
-perf report -n -g -i /root/$testname-$rate.perf >$testname-$rate.report
-sleep 1
-exit
-EOF
-                ;;
-                2)
-ssh -T $username@$serverip <<EOF
-killall pcm.x
-cp ~/out.csv ~/ProfileLog/profiler-$testname-$rate.csv
-exit
-EOF
-                ;;
-                *)
-                echo "Iligal Profiler Code"
-                ;;
-                esac
+#process this perf data to svg on squid sever
 
-
-
-fi
 
 
 done
@@ -348,28 +362,43 @@ else
 ./GraphGenerator.sh $testname $TotalCores 2 svg $Sessionbased $connections ./RUNs/
 fi
 
-#if [ $HWmonitor -eq 1 ]; then
-#
-#case "$Profiler" in
-#0)
-#./OprofileOutputParser  $testname
-#1)
+if [ $HWmonitor -eq 1 ]; then
+
+case "$Profiler" in
+0)
+./OprofileOutputParser  $testname
+1)
 #echo "copying Perf Rates file"
 #cp ./PerfRates.txt ./RUNs/$testname/PerfRates.txt
 #echo "copying Perf Events file"
 #cp ./perfevent.txt ./RUNs/$testname/perfevent.txt
 #cd  RUNs/$testname
 #./PerfOutputParser  $testname
-#;;
-#2)
-#./IPCMOutputParser  $testname
-#;;
-#*)
+#need genarate svg on the server
+#perffiles=/root/ProfileLog/profiler-$testname-$rate-perf.data
+
+#cd /root/Prof
+#for perfdata in /root/Prof/perf*
+#do
+##  perf script -f comm,pid,tid,ip,sym,dso -i $perfdata |./FlameGraph/stackcollapse-perf.pl -pid |awk -F';' '{print $1}'|uniq|cut -d '-' --fields=2
+#   perf script -f comm,pid,tid,ip,sym,dso -i $perfdata |./FlameGraph/stackcollapse-perf.pl -pid > c$perfdata
+#   squidpids=`awk -F';' '{print $1}' c$perfdata |uniq|cut -d '-' --fields=2`
+#   for squidpid in $squidpids
+#   do
+#       grep $squidpid  c$perfdata |./FlameGraph/flamegraph.pl > $perfdata-$squidpid.svg
+#   done
+#done
+echo perf output in dir Flamegraph
+;;
+2)
+./IPCMOutputParser  $testname
+;;
+*)
 #echo "Iligal Profiler Code"
-#;;
-#esac
-#
-#fi
+;;
+esac
+
+fi
 
 
 exec 0<&3

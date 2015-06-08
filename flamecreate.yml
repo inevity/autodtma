@@ -1,0 +1,6 @@
+---
+- hosts: 10.10.10.254
+  remote_user: root
+  vars:
+       outfile: '{{outfile}}'
+- script: /root/RUNs/flamecreate.sh --perfdata  '{{outfile}}'     
