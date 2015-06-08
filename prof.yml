@@ -1,0 +1,21 @@
+---
+- hosts: 10.10.10.254
+  remote_user: root
+  vars:
+       outfile: '{{outfile}}'
+       ctime:   '{{ctime}}'
+    #   pids:  '{{pids}}'
+       
+  tasks:
+  - name: get squid pids
+    shell:  /bin/ps -ef |grep fc-cache |grep -v grep |awk '{print $2'}|tr '\n' ','
+    #shell:  /bin/ps -ef |grep fc-cache |grep squid |awk 'NR <7' '{print $2'}|tr '\n' ','
+    #shell: dummy=$(/bin/ps -ef |grep fc-cache |grep squid |awk '{print $2'}|tr '\n' ','
+    register: pids
+    ignore_errors: True
+
+  - name: run perf
+    shell: dummy=$(perf record -F 99 -a -g -p '{{pids.stdout}}' -o '{{outfile}}' -- sleep '{{ctime}}')
+    async: 300
+    poll: 0
+    #using sync to test 
