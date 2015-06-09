@@ -3,4 +3,15 @@
   remote_user: root
   vars:
        outfile: '{{outfile}}'
-- script: /root/RUNs/flamecreate.sh --perfdata  '{{outfile}}'     
+
+  tasks:
+  #- script: /root/RUNs/flamecreate.sh '{{outfile}}'     
+#- script: /root/RUNs/flamecreate.sh --'{{outfile}}'     
+#- script: /root/RUNs/flamecreate.sh --perfdata  '{{outfile}}'     
+#- script: /root/RUNs/flamecreate.sh --some-arguments  '{{outfile}}'
+  - name: generate flamegraph ...- must align with tasks!!!!
+    #shell: dummy=$(/root/RUNs/flamecreate.sh '{{outfile}}') chdir=/root/ 
+    #shell: /root/RUNs/flamecreate.sh '{{outfile}}' chdir=/root/ 
+    shell: /root/RUNs/flamecreate.sh '{{outfile}}' chdir=/root/RUNs
+#  - name: generate flamegraph
+#    shell: ls   

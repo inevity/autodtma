@@ -32,9 +32,9 @@ c=0
 while [ $c -lt 3 ]
 do
      (( c++ ))
-for filesize in 1024 65536 131072 196608 262144 327680 393216 458752 524288 589824 655360 786432 1048576
+#for filesize in 1024 65536 131072 196608 262144 327680 393216 458752 524288 589824 655360 786432 1048576
 #for filesize in 612 1024 524288 1048576 10485760 104857600
-#for filesize in 612 1024
+for filesize in 612 1024
 #for filesize in 524288 1048576
 #for filesize in 10485760 104857600
 do
@@ -265,7 +265,8 @@ EOF
 #pids=`sshpass -p 'sophnep!@#' ps -ef |grep fc-cache |grep squid |awk '{print $2'}|tr '\n' ','`
 #pids=`ps -ef |grep fc-cache |grep squid |awk '{print $2'}|tr '\n' ','`
 #ansible-playbook prof.yml --verbose --extra-vars "pids=$pids outfile=/root/util$testname-$rate ctime=$testtime"
-ansible-playbook flamecreate.yml -v --verbose --extra-vars "outfile=/root/Prof/perf$testname-$rate" 
+#ansible-playbook flamecreate.yml -v --verbose --extra-vars "outfile=/root/Prof/perf$testname-$rate" 
+ansible-playbook prof.yml -v --verbose --extra-vars "outfile=/root/Prof/perf$testname-$rate ctime=$testtime" 
                ;;
                 2)
 ssh -T $username@$serverip <<EOF
@@ -280,6 +281,7 @@ EOF
 
         fi
 ####### Waiting till the monitor and test is finished #########
+        echo sleep and testing 
         sleep $testtime
         sleep 30
 
@@ -326,8 +328,10 @@ EOF
 #
 
 
-#process this perf data to svg on squid sever
+echo process this perf data to svg on squid sever
 
+#ansible-playbook flamecreate.yml -v --verbose --extra-vars "outfile=/root/Prof/perf$testname-$rate" 
+ansible-playbook flamecreate.yml -v --verbose --extra-vars "outfile=perf$testname-$rate" 
 
 
 done
@@ -367,6 +371,7 @@ if [ $HWmonitor -eq 1 ]; then
 case "$Profiler" in
 0)
 ./OprofileOutputParser  $testname
+;;
 1)
 #echo "copying Perf Rates file"
 #cp ./PerfRates.txt ./RUNs/$testname/PerfRates.txt
