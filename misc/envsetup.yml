@@ -1,0 +1,201 @@
+---
+- hosts: alltest
+  gather_facts: yes
+  user: root
+  environment: 
+     LC_CTYPE: en_US.UTF-8
+  tasks:
+#  - name: make sure eth0 starts at boot
+#    lineinfile: dest=/etc/sysconfig/network-scripts/ifcfg-eth0 regexp=^ONBOOT= line=ONBOOT=yes backup=yes
+#  - name: put ssh-key in
+#    authorized_key: user=root key="{{lookup('file', '~/.ssh/id_dsa.pub') }}" manage_dir=yes
+
+#  - name: get epel-repo rpm RHEL6
+#    get_url: dest=/tmp/epel-release.rpm  url=http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
+#    when: ansible_os_family == 'RedHat' and ansible_lsb.major_release|int == 6
+#  - name: get epel-repo rpm RHEL5
+#    get_url: dest=/tmp/epel-release.rpm  url=http://download.fedoraproject.org/pub/epel/5/i386/epel-release-5-4.noarch.rpm
+#    when: ansible_os_family == 'RedHat' and ansible_lsb.major_release|int == 5
+
+#  - name: install epel-repo rpm
+#    yum: pkg=/tmp/epel-release.rpm state=installed
+
+  - name: dns
+    script: /root/dns.sh 
+    when: ansible_os_family == 'Debian' and ansible_lsb.major_release|int == 14
+ 
+  - name: install my packages on centos
+    yum: pkg={{ item }} state=installed
+    when: ansible_os_family == 'RedHat' and ansible_lsb.major_release|int == 6
+    with_items:
+       - iotop
+       - wget
+       - sysstat
+       - screen
+       - iperf
+       - atop
+       - lrzsz
+       - nginx
+
+  - name: install my packages on ubuntu
+    apt: pkg={{ item }} state=installed
+    when: ansible_os_family == 'Debian' and ansible_lsb.major_release|int == 14
+    with_items:
+       - make
+       - lrzsz
+       - sysstat
+       - iperf
+       - openssl 
+       - libpcre3-dev 
+       - libxml2 
+       - libxml2-dev 
+       - libglib2.0-0 
+       - libglib2.0-dev 
+       - libdb5.3 
+       - libdb5.3-dev 
+       - libadns1 
+       - libadns1-dev
+       - g++
+       - libpcre3
+       - libssl-dev
+       - subversion
+       - git
+       - linux-tools-common
+       - linux-tools-{{ansible_kernel}}
+       - iftop
+
+   #sshpass -p 'sophnep!@#' ssh -q 192.168.1.254 "svn --username baojg --password chinacbaojg --non-interactive --no-auth-cache co svn+ssh://baojg@192.168.1.234/svnroot/ucache"
+  - name: svn repo
+    subversion: repo=svn+ssh://baojg@192.168.1.234/svnroot/ucache username='baojg' password='chinacbaojg' dest=/root/ucach5e
+    #when: ansible_os_family == 'Debian' and ansible_lsb.major_release|int == 14
+    #async: 1
+    #poll: 0  if ansible error,we should killall ansible,then re run
+    ignore_errors: true
+    when: ansible_os_family == 'Debian' and ansible_lsb.major_release|int == 14
+
+ 
+  - name: download testtools
+    git: repo=https://github.com/inevity/squidpatch.git dest=/root/squidpatch 
+
+  - git: repo=https://github.com/brendangregg/FlameGraph.git dest=/root/Flamegraph
+#  - git: repo=https://github.com/inevity/autodtma.git dest=/root/RUNs
+  - git: repo=https://github.com/openresty/nginx-systemtap-toolkit.git dest=/root/nginx-systemtap-toolkit
+  - git: repo=https://github.com/lighttpd/weighttp.git dest=/root/weighttp
+
+  - name: Disable SELinux in conf file
+    selinux: state=disabled
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+  - lineinfile: dest=/etc/selinux/config regexp=^SELINUX= line=SELINUX=disabled
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+  - name: update YUM repositories
+    shell: 'yum -y update'
+    #yum: name=* update_cache=yes
+    #yum:  update_cache=yes wrong
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+
+  - name: Run "apt-get update" to update the source list
+    apt: update_cache=yes
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+
+  - name: install the 'Development tools' package group
+    yum: name="@Development tools" state=present
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+  - name: sysctl and limitconf
+    shell: /root/RUNs/misc/sysctlu.sh
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - shell: /root/RUNs/misc/sysctlc.sh
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+  - shell: /root/RUNs/misc/limitu.sh
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - shell: /root/RUNs/misc/limitc.sh
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+
+#  - name: activate autoupdate
+#    service: enabled=yes state=started name=yum-cron
+
+#  - name: initialize etckeeper
+#    command: /usr/bin/etckeeper init creates=/etc/.git/description
+#  - name: make first commit
+#   command: /usr/bin/etckeeper commit -m "init" creates=/etc/.git/COMMIT_EDITMSG
+
+  - name: untar collectl on ubuntu
+    unarchive: src=/root/squidpatch/collectl-4.0.0.src.tar dest=/root/squidpatch/ copy=no
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - name: install collectl on ubuntu
+    command: /root/squidpatch/collectl-4.0.0/UNINSTALL chdir=/root/squidpatch/collectl-4.0.0
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - command: /root/squidpatch/collectl-4.0.0/INSTALL chdir=/root/squidpatch/collectl-4.0.0
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - shell: mkdir UtilLog chdir=/root
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - shell: mkdir Prof chdir=/root
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - shell: cp -av /root/FlameGraph /root/Flamegraph
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - shell: sed -ibackup 's/.*FD_SETSIZE.*/\#define __FD_SETSIZE\ 344800/g' /usr/include/x86_64-linux-gnu/bits/typesizes.h
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - shell: sed -ibackup 's/.*FD_SETSIZE.*/\#define __FD_SETSIZE\ 344800/g' /usr/include/linux/posix_types.h
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - shell: sed -ibackup 's/.*FD_SETSIZE.*/\#define __FD_SETSIZE\ 102400/g' /usr/include/linux/posix_types.h
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+  - shell: sed -ibackup 's/.*FD_SETSIZE.*/\#define __FD_SETSIZE\ 102400/g' /usr/include/bits/typesizes.h
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+  - shell: cp debug.patch /root/ucache/ chdir=/root/squidpatch
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - name: patch the ucache to build and test
+    patch: >
+           src=/root/ucache/debug.patch
+           basedir=/root/ucache
+           strip=0
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - shell: ln -s /usr/lib/x86_64-linux-gnu /usr/lib64
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - shell: shutdown -r now
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+#  - name: compile and build deb and install
+#    shell: /root/RUNs/misc/builddeb.sh chdir=/root/ucache/src/FlyCache1.0
+#    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+#
+#
+#  - name: modify server hosts and squid.conf and restart squid
+#    shell: /root/RUNs/misc/serverhosts.sh chdir=/root/squidpatch
+#    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+#
+#  - name: change client hosts
+#    shell: echo '10.10.10.254 www.myweb.com' >> /etc/hosts
+#    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+#
+#  - name: resume fileset change
+#    shell: cp /usr/include/x86_64-linux-gnu/bits/typesizes.hbackup /usr/include/x86_64-linux-gnu/bits/typesizes.h
+#    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+#
+#  - shell: cp /usr/include/linux/posix_types.hbackup /usr/include/linux/posix_types.h
+#    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+#  # client fileset changse unresume todo.
+#  # maybe need shutdown -r 
+#  - name: start ngnix
+#    service: enabled=yes state=restarted name=nginx
+#    when: ansible_os_family == 'RedHat' and ansible_lsb.major_release|int == 6

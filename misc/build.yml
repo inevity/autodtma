@@ -1,0 +1,30 @@
+---
+- hosts: alltest
+  gather_facts: yes
+  user: root
+  environment:
+     LC_CTYPE: en_US.UTF-8
+  tasks:
+   - name: compile and build deb and install
+     shell: /root/RUNs/misc/builddeb.sh chdir=/root/ucache/src/FlyCache1.0
+     when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+   - name: modify server hosts and squid.conf and restart squid
+     shell: /root/RUNs/misc/serverhosts.sh chdir=/root/squidpatch
+     when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+   - name: change client hosts
+     shell: echo '10.10.10.254 www.myweb.com' >> /etc/hosts
+     when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+   - name: resume fileset change
+     shell: cp /usr/include/x86_64-linux-gnu/bits/typesizes.hbackup /usr/include/x86_64-linux-gnu/bits/typesizes.h
+     when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+   - shell: cp /usr/include/linux/posix_types.hbackup /usr/include/linux/posix_types.h
+     when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+      # client fileset changse unresume todo.
+                                                   # maybe need shutdown -r
+   - name: start ngnix
+     service: enabled=yes state=restarted name=nginx
+     when: ansible_os_family == 'RedHat' and ansible_lsb.major_release|int == 6
