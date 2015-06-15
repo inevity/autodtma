@@ -39,3 +39,6 @@ Core.sh
 
 
 注：
+select rate for file 
+revert to svn
+replicate problem
