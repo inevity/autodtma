@@ -10,6 +10,13 @@ git clone https://github.com/inevity/squidpatch.git
 yum localinstall -y  squidpatch/epel-release-6-8.noarch.rpm
 linennnn=`awk 'NF==0 {print NR}' /etc/ansible/hosts |head -1`
 sed -ibackup -r -e  "${linennnn}s/.*/10.10.10.254\nlocahost/" /etc/ansible/hosts
+
+tee -a /etc/ansible/hosts << EOF
+[alltests]
+10.10.10.254
+localhost
+EOF
+
 rm -fr ~/.ssh/*
 ssh-keygen  -t rsa -f ~/.ssh/id_rsa  -N ''
 ./sshkeyput.sh localhost
@@ -17,5 +24,5 @@ ssh-keygen  -t rsa -f ~/.ssh/id_rsa  -N ''
 yum install -y ansible
 #ansible is not needed on server.
 ansible-playbook --verbose -vvvv -f 1 envsetup.yml
-#we alse reboot the client meachine
+#we alse reboot the client meachine,server reboot in envsetup.yml
 shutdown -r now

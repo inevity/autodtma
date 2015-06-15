@@ -82,6 +82,7 @@ do
     if [ $realfsize == $filesize ]
     then
        wget http://www.myweb.com/index.html
+
 echo "fc Will be running in totalcores-2  instances,(in fact 6 instances) ,exclude core 0 and one nginx(lscs) cores"
 echo "using filesize $filesize,and replicate three times"
       m=$(echo "$testname1-$filesize")
@@ -335,7 +336,7 @@ ansible-playbook flamecreate.yml -v --verbose --extra-vars "outfile=perf$testnam
 
 
 done
-# for rates for a filesize 
+# for all rates for a filesize 
 
 
 
