@@ -7,11 +7,13 @@ yum install -y git
 git clone https://github.com/inevity/autodtma.git RUNs
 
 3，在客户端 进入RUNs／misc,
-执行./setup(进行一系列设置后服务器和client机器会先后重启)
+执行./setup
+进行一系列设置后服务器和client机器会先后重启
 4,在客户端，待两者重启后
-/root/RUNs/misc／rebootafter.sh
+/root/RUNs/misc/rebootafter.sh
+
 其中编译squid（ucache）编译htterpf：，重启nginx，squid。
-5，在客户端 生成所测试的文件（根据Core.sh和测试的目的）
+同时在客户端 生成所测试的文件（根据Core.sh和测试的目的）
 例如
 cd /usr/share/nginx/html/
 dd if=/dev/zero of=612B bs=1 count=612
@@ -41,4 +43,7 @@ Core.sh
 注：
 select rate for file 
 revert to svn
-replicate problem
+test replicate problem
+repeate run the script
+manual operate is 1 2 6 ,we should  select ratefile and filesize to run 7.
+

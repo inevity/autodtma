@@ -66,7 +66,7 @@
 
    #sshpass -p 'sophnep!@#' ssh -q 192.168.1.254 "svn --username baojg --password chinacbaojg --non-interactive --no-auth-cache co svn+ssh://baojg@192.168.1.234/svnroot/ucache"
   - name: svn repo
-    subversion: repo=svn+ssh://baojg@192.168.1.234/svnroot/ucache username='baojg' password='chinacbaojg' dest=/root/ucach5e
+    subversion: repo=svn+ssh://baojg@192.168.1.234/svnroot/ucache username='baojg' password='chinacbaojg' dest=/root/ucache
     #when: ansible_os_family == 'Debian' and ansible_lsb.major_release|int == 14
     #async: 1
     #poll: 0  if ansible error,we should killall ansible,then re run
@@ -76,9 +76,10 @@
  
   - name: download testtools
     git: repo=https://github.com/inevity/squidpatch.git dest=/root/squidpatch 
+    when: ansible_os_family == 'Debian' and ansible_lsb.major_release|int == 14
 
-  - git: repo=https://github.com/brendangregg/FlameGraph.git dest=/root/Flamegraph
-#  - git: repo=https://github.com/inevity/autodtma.git dest=/root/RUNs
+  - git: repo=https://github.com/brendangregg/FlameGraph.git dest=/root/Flamegraph 
+#  - git: repo=https://github.com/inevity/autodtma.git dest=/root/RUNs  have download in Flamegraph
   - git: repo=https://github.com/openresty/nginx-systemtap-toolkit.git dest=/root/nginx-systemtap-toolkit
   - git: repo=https://github.com/lighttpd/weighttp.git dest=/root/weighttp
 
@@ -115,6 +116,7 @@
 
   - shell: /root/RUNs/misc/sysctlc.sh
     when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+    ignore_errors: true
 
   - shell: /root/RUNs/misc/limitu.sh
     when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
@@ -148,8 +150,8 @@
   - shell: mkdir Prof chdir=/root
     when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
-  - shell: cp -av /root/FlameGraph /root/Flamegraph
-    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+#  - shell: cp -av /root/FlameGraph /root/Flamegraph
+#    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
   - shell: sed -ibackup 's/.*FD_SETSIZE.*/\#define __FD_SETSIZE\ 344800/g' /usr/include/x86_64-linux-gnu/bits/typesizes.h
     when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
