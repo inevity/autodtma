@@ -82,6 +82,10 @@
   - git: repo=https://github.com/openresty/nginx-systemtap-toolkit.git dest=/root/nginx-systemtap-toolkit
   - git: repo=https://github.com/lighttpd/weighttp.git dest=/root/weighttp
 
+
+  - git: repo=https://github.com/inevity/autodtma.git dest=/root/RUNs
+    when: ansible_os_family == 'Debian' and ansible_lsb.major_release|int == 14
+
   - name: Disable SELinux in conf file
     selinux: state=disabled
     when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'

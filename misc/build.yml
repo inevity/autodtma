@@ -24,7 +24,12 @@
    - shell: cp /usr/include/linux/posix_types.hbackup /usr/include/linux/posix_types.h
      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
       # client fileset changse unresume todo.
-                                                   # maybe need shutdown -r
+                                                     # maybe need shutdown -r
+   - name: compile htterpf and average
+     shell: /root/RUNs/misc/buildhttperfandaverage.sh chdir=/root/RUNs/misc
+     when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+#  httperf recompile need make clean and rm config.cache.
+
    - name: start ngnix
      service: enabled=yes state=restarted name=nginx
      when: ansible_os_family == 'RedHat' and ansible_lsb.major_release|int == 6
