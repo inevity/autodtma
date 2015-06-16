@@ -190,6 +190,8 @@
   - shell: shutdown -r now
     when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
+  - service: name=iptables enabled=no state=stopped
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 #  - name: compile and build deb and install
 #    shell: /root/RUNs/misc/builddeb.sh chdir=/root/ucache/src/FlyCache1.0
 #    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
