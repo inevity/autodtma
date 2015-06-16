@@ -111,17 +111,17 @@
     when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
   - name: sysctl and limitconf
-    shell: /root/RUNs/misc/sysctlu.sh
+    shell: /root/RUNs/misc/sysctlu.sh && touch /root/.sysctlu creates=/root/.sysctlu
     when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
-  - shell: /root/RUNs/misc/sysctlc.sh
+  - shell: /root/RUNs/misc/sysctlc.sh && touch /root/.sysctlc creates=/root/.sysctlc
     when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
     ignore_errors: true
 
-  - shell: /root/RUNs/misc/limitu.sh
+  - shell: /root/RUNs/misc/limitu.sh && touch /root/.limitu creates=/root/.limitu
     when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
-  - shell: /root/RUNs/misc/limitc.sh
+  - shell: /root/RUNs/misc/limitc.sh && touch /root/.limitc creates=/root/.limitc
     when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
 
@@ -153,16 +153,25 @@
 #  - shell: cp -av /root/FlameGraph /root/Flamegraph
 #    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
-  - shell: sed -ibackup 's/.*FD_SETSIZE.*/\#define __FD_SETSIZE\ 344800/g' /usr/include/x86_64-linux-gnu/bits/typesizes.h
+  - shell: sed -ibackup 's/.*FD_SETSIZE.*/\#define __FD_SETSIZE\ 344800/g' /usr/include/x86_64-linux-gnu/bits/typesizes.h && touch /root/.344800t
+    args: 
+       creates: /root/.344800t      
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+   
+
+  - shell: sed -ibackup 's/.*FD_SETSIZE.*/\#define __FD_SETSIZE\ 344800/g' /usr/include/linux/posix_types.h && touch /root/.344800p
+    args: 
+       creates: /root/.344800p      
     when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
-  - shell: sed -ibackup 's/.*FD_SETSIZE.*/\#define __FD_SETSIZE\ 344800/g' /usr/include/linux/posix_types.h
-    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-
-  - shell: sed -ibackup 's/.*FD_SETSIZE.*/\#define __FD_SETSIZE\ 102400/g' /usr/include/linux/posix_types.h
+  - shell: sed -ibackup 's/.*FD_SETSIZE.*/\#define __FD_SETSIZE\ 102400/g' /usr/include/linux/posix_types.h && touch /root/.102400p
+    args: 
+       creates: /root/.102400p      
     when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
-  - shell: sed -ibackup 's/.*FD_SETSIZE.*/\#define __FD_SETSIZE\ 102400/g' /usr/include/bits/typesizes.h
+  - shell: sed -ibackup 's/.*FD_SETSIZE.*/\#define __FD_SETSIZE\ 102400/g' /usr/include/bits/typesizes.h && touch /root/.102400t
+    args: 
+       creates: /root/.102400t     
     when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
   - shell: cp debug.patch /root/ucache/ chdir=/root/squidpatch

@@ -10,6 +10,7 @@ DeviceList.Ethernet.eth0.Type=Ethernet
 DeviceList.Ethernet.eth0.BootProto=static
 DeviceList.Ethernet.eth0.OnBoot=True
 DeviceList.Ethernet.eth0.NMControlled=no
+DeviceList.Ethernet.eth0.PrimaryDNS=8.8.4.4
 DeviceList.Ethernet.eth0.Netmask=255.255.255.0
 DeviceList.Ethernet.eth0.IP=${clientipw}
 DeviceList.Ethernet.eth0.Gateway=192.168.1.1
