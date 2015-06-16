@@ -23,7 +23,7 @@ tee -a /etc/ansible/hosts << EOF
 10.10.10.254
 localhost
 EOF
-
+# only run once !
 #tee -a /etc/ansible/hosts << EOF
 #[alltest]
 #192.168.1.227

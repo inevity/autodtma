@@ -20,9 +20,9 @@
 #  - name: install epel-repo rpm
 #    yum: pkg=/tmp/epel-release.rpm state=installed
 
-  - name: dns
-    script: /root/dns.sh 
-    when: ansible_os_family == 'Debian' and ansible_lsb.major_release|int == 14
+#  - name: dns
+#    script: /root/dns.sh 
+#    when: ansible_os_family == 'Debian' and ansible_lsb.major_release|int == 14
  
   - name: install my packages on centos
     yum: pkg={{ item }} state=installed
