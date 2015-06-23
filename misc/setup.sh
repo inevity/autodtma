@@ -19,6 +19,7 @@ sed -ibackup -r -e  "${linennnn}s/.*/10.10.10.254\nlocahost/" /etc/ansible/hosts
 #sed -ibackup -r -e  "${linennnn}s/.*/192.168.1.227\nlocahost/" /etc/ansible/hosts
 
 tee -a /etc/ansible/hosts << EOF
+
 [alltest]
 10.10.10.254
 localhost

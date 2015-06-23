@@ -1,5 +1,5 @@
 1，配置好服务器和client 网络
-内网和外网
+内网和外网,include dns
 
 2，在客户端
 
@@ -18,7 +18,8 @@ git clone https://github.com/inevity/autodtma.git RUNs
 cd /usr/share/nginx/html/
 dd if=/dev/zero of=612B bs=1 count=612
 
-6，利用iperf进行网络验证
+6，
+  利用iperf进行网络验证
   手动进行httperf测试，观察squid是否配置好,squidlog -a 是否hit
 7，根据所要测试的文件大小，修改RUNs下的filemap和Core.sh 中第35行的文件列表，开始测试
 比如

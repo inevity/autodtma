@@ -12,7 +12,7 @@ iface eth0 inet static
 	netmask 255.255.255.0
 	gateway 192.168.1.1
 	# dns-* options are implemented by the resolvconf package, if installed
-	dns-nameservers 127.0.0.1
+	dns-nameservers 8.8.4.4
 auto eth2
 iface eth2 inet static
 	address 10.10.10.254

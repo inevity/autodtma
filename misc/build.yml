@@ -28,7 +28,7 @@
    - name: compile htterpf and average
      shell: /root/RUNs/misc/buildhttperfandaverage.sh chdir=/root/RUNs/misc
      when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
-#  httperf recompile need make clean and rm config.cache.
+#  httperf change and recompile need make clean and rm config.cache.
 
    - name: restart ngnix
      service: enabled=yes state=restarted name=nginx
