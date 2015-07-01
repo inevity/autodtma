@@ -158,7 +158,7 @@
     args: 
        creates: /root/.344800t      
     when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-   
+  #need fix ,some other line containing the setsize alse changed . 
 
   - shell: sed -ibackup 's/.*FD_SETSIZE.*/\#define __FD_SETSIZE\ 344800/g' /usr/include/linux/posix_types.h && touch /root/.344800p
     args: 
